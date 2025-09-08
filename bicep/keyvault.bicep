@@ -13,6 +13,12 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing 
   name: subnetName
 }
 
+@secure()
+param langfuseSalt string
+@secure()
+param langfuseEncryptionKey string
+@secure()
+param langfuseNextAuthSecret string
 resource keyVault 'Microsoft.KeyVault/vaults@2024-12-01-preview' = {
   name: kvName
   location: resourceGroup().location
@@ -43,7 +49,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2024-12-01-preview' = {
     publicNetworkAccess: 'Enabled'
   }
 
-  resource storageAccountKey1 'secrets@2024-12-01-preview' = {
+  resource secretStorageAccountKey1 'secrets@2024-12-01-preview' = {
     name: '${storageAccount.name}-key1'
     properties: {
       attributes: {
@@ -54,36 +60,36 @@ resource keyVault 'Microsoft.KeyVault/vaults@2024-12-01-preview' = {
     }
   }
 
-  resource langfuseSalt 'secrets@2024-12-01-preview' = {
+  resource secretLangfuseSalt 'secrets@2024-12-01-preview' = {
     name: 'langfuse-salt'
     properties: {
       attributes: {
         enabled: true
       }
       contentType: 'string'
-      value: 'mysalt' // CHANGEME: generate via `openssl rand -base64 32`
+      value: langfuseSalt
     }
   }
 
-  resource langfuseEncryptionKey 'secrets@2024-12-01-preview' = {
+  resource secretLangfuseEncryptionKey 'secrets@2024-12-01-preview' = {
     name: 'langfuse-encryption-key'
     properties: {
       attributes: {
         enabled: true
       }
       contentType: 'string'
-      value: '0000000000000000000000000000000000000000000000000000000000000000' // CHANGEME: generate via `openssl rand -hex 32`
+      value: langfuseEncryptionKey
     }
   }
 
-  resource langfuseNextAuthSecret 'secrets@2024-12-01-preview' = {
+  resource secretLangfuseNextAuthSecret 'secrets@2024-12-01-preview' = {
     name: 'langfuse-nextauth-secret'
     properties: {
       attributes: {
         enabled: true
       }
       contentType: 'string'
-      value: 'mysecret' // CHANGEME: generate via `openssl rand -base64 32`
+      value: langfuseNextAuthSecret
     }
   }
 }

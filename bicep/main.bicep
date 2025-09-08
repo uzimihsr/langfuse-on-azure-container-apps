@@ -41,6 +41,8 @@ module storage './storage.bicep' = {
 
 param psqlName string = 'psql-langfuse-${uniqueString(resourceGroup().id)}'
 param psqlAdminUserName string = 'postgresql'
+@secure()
+param psqlAdminUserLoginPassword string
 module postgresql './postgresql.bicep' = {
   name: 'postgresql-deployment'
   params: {
@@ -49,7 +51,7 @@ module postgresql './postgresql.bicep' = {
     vnetName: vnetName
     subnetName: subnetNamePrivateEndpointPostgreSql
     pepName: 'pep-${psqlName}'
-    psqlAdminUserLoginPassword: uniqueString('postgres-password', resourceGroup().id)
+    psqlAdminUserLoginPassword: psqlAdminUserLoginPassword
     psqlAdminUserName: psqlAdminUserName
   }
   dependsOn: [
@@ -57,6 +59,12 @@ module postgresql './postgresql.bicep' = {
   ]
 }
 
+@secure()
+param langfuseSalt string
+@secure()
+param langfuseEncryptionKey string
+@secure()
+param langfuseNextAuthSecret string
 param kvName string = 'kvlangfuse${uniqueString(resourceGroup().id)}'
 module keyvault './keyvault.bicep' = {
   name: 'keyvault-deployment'
@@ -65,6 +73,9 @@ module keyvault './keyvault.bicep' = {
     storageAccountName: stNameBlob
     vnetName: vnetName
     subnetName: subnetNameContainerAppsEnvironment
+    langfuseSalt: langfuseSalt
+    langfuseEncryptionKey: langfuseEncryptionKey
+    langfuseNextAuthSecret: langfuseNextAuthSecret
   }
   dependsOn: [
     vnet
@@ -74,6 +85,11 @@ module keyvault './keyvault.bicep' = {
 
 param caeName string = 'cae-langfuse-${uniqueString(resourceGroup().id)}'
 param caName string = 'ca-langfuse-${uniqueString(resourceGroup().id)}'
+param clickhouseUser string = 'clickhouse'
+@secure()
+param clickhousePassword string
+@secure()
+param redisPassword string
 module containerapps './containerapps.bicep' = {
   name: 'containerapps-deployment'
   params: {
@@ -84,6 +100,9 @@ module containerapps './containerapps.bicep' = {
     stNameFile: stNameFile
     kvName: kvName
     vnetName: vnetName
+    clickhouseUser: clickhouseUser
+    clickhousePassword: clickhousePassword
+    redisPassword: redisPassword
     subnetName: subnetNameContainerAppsEnvironment
     psqlName: psqlName
   }

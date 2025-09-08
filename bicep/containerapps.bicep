@@ -94,8 +94,11 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2025-02-02-
   }
 }
 
-var clickhouseUser = 'clickhouse'
-var clickhousePassword = 'clickhouse'
+param clickhouseUser string
+@secure()
+param clickhousePassword string
+@secure()
+param redisPassword string
 param psqlName string
 resource containerApps 'Microsoft.App/containerapps@2025-02-02-preview' = {
   name: caName
@@ -134,7 +137,7 @@ resource containerApps 'Microsoft.App/containerapps@2025-02-02-preview' = {
         }
         {
           name: 'redis-password'
-          value: uniqueString('redis-password', resourceGroup().id)
+          value: redisPassword
         }
         {
           name: 'postgres-connection-string'
@@ -143,7 +146,7 @@ resource containerApps 'Microsoft.App/containerapps@2025-02-02-preview' = {
         }
         {
           name: 'redis-connection-string'
-          value: 'redis://default:${uniqueString('redis-password', resourceGroup().id)}@localhost:6379/0'
+          value: 'redis://default:${redisPassword}@localhost:6379/0'
         }
         {
           name: '${storageAccountBlob.name}-key1'
@@ -405,6 +408,5 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleId)
     principalId: containerApps.identity.principalId
     principalType: 'ServicePrincipal'
-    scope: resourceGroup().id
   }
 }
