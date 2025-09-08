@@ -65,6 +65,8 @@ param langfuseSalt string
 param langfuseEncryptionKey string
 @secure()
 param langfuseNextAuthSecret string
+@secure()
+param langfuseInitUserPassword string
 param kvName string = 'kvlangfuse${uniqueString(resourceGroup().id)}'
 module keyvault './keyvault.bicep' = {
   name: 'keyvault-deployment'
@@ -76,6 +78,7 @@ module keyvault './keyvault.bicep' = {
     langfuseSalt: langfuseSalt
     langfuseEncryptionKey: langfuseEncryptionKey
     langfuseNextAuthSecret: langfuseNextAuthSecret
+    langfuseInitUserPassword: langfuseInitUserPassword
   }
   dependsOn: [
     vnet
@@ -85,6 +88,10 @@ module keyvault './keyvault.bicep' = {
 
 param caeName string = 'cae-langfuse-${uniqueString(resourceGroup().id)}'
 param caName string = 'ca-langfuse-${uniqueString(resourceGroup().id)}'
+param langfuseInitUserEmail string = 'user@example.com'
+param langfuseInitUserName string = 'John Doe'
+param langfuseInitOrgName string = 'My Org'
+param langfuseInitProjectName string = 'My Project'
 param clickhouseUser string = 'clickhouse'
 @secure()
 param clickhousePassword string
@@ -105,6 +112,10 @@ module containerapps './containerapps.bicep' = {
     redisPassword: redisPassword
     subnetName: subnetNameContainerAppsEnvironment
     psqlName: psqlName
+    langfuseInitOrgName: langfuseInitOrgName
+    langfuseInitProjectName: langfuseInitProjectName
+    langfuseInitUserEmail: langfuseInitUserEmail
+    langfuseInitUserName: langfuseInitUserName
   }
   dependsOn: [
     vnet

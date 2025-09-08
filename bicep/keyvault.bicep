@@ -19,6 +19,8 @@ param langfuseSalt string
 param langfuseEncryptionKey string
 @secure()
 param langfuseNextAuthSecret string
+@secure()
+param langfuseInitUserPassword string
 resource keyVault 'Microsoft.KeyVault/vaults@2024-12-01-preview' = {
   name: kvName
   location: resourceGroup().location
@@ -90,6 +92,17 @@ resource keyVault 'Microsoft.KeyVault/vaults@2024-12-01-preview' = {
       }
       contentType: 'string'
       value: langfuseNextAuthSecret
+    }
+  }
+
+  resource secretLangfuseInitUserPassword 'secrets@2024-12-01-preview' = {
+    name: 'langfuse-init-user-password'
+    properties: {
+      attributes: {
+        enabled: true
+      }
+      contentType: 'string'
+      value: langfuseInitUserPassword
     }
   }
 }

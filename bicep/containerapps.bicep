@@ -100,6 +100,10 @@ param clickhousePassword string
 @secure()
 param redisPassword string
 param psqlName string
+param langfuseInitUserEmail string
+param langfuseInitUserName string
+param langfuseInitOrgName string
+param langfuseInitProjectName string
 resource containerApps 'Microsoft.App/containerapps@2025-02-02-preview' = {
   name: caName
   location: resourceGroup().location
@@ -161,6 +165,11 @@ resource containerApps 'Microsoft.App/containerapps@2025-02-02-preview' = {
         {
           name: 'langfuse-encryption-key'
           keyVaultUrl: '${keyVault.properties.vaultUri}secrets/langfuse-encryption-key'
+          identity: 'system'
+        }
+        {
+          name: 'langfuse-init-user-password'
+          keyVaultUrl: '${keyVault.properties.vaultUri}secrets/langfuse-init-user-password'
           identity: 'system'
         }
         {
@@ -228,6 +237,30 @@ resource containerApps 'Microsoft.App/containerapps@2025-02-02-preview' = {
             {
               name: 'LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY'
               secretRef: '${storageAccountBlob.name}-key1'
+            }
+            {
+              name: 'LANGFUSE_INIT_USER_EMAIL'
+              value: langfuseInitUserEmail
+            }
+            {
+              name: 'LANGFUSE_INIT_USER_NAME'
+              value: langfuseInitUserName
+            }
+            {
+              name: 'LANGFUSE_INIT_USER_PASSWORD'
+              secretRef: 'langfuse-init-user-password'
+            }
+            {
+              name: 'LANGFUSE_INIT_ORG_NAME'
+              value: langfuseInitOrgName
+            }
+            {
+              name: 'LANGFUSE_INIT_PROJECT_NAME'
+              value: langfuseInitProjectName
+            }
+            {
+              name: 'AUTH_DISABLE_SIGNUP'
+              value: 'true'
             }
             {
               name: 'NEXTAUTH_SECRET'
@@ -304,6 +337,30 @@ resource containerApps 'Microsoft.App/containerapps@2025-02-02-preview' = {
             {
               name: 'LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY'
               secretRef: '${storageAccountBlob.name}-key1'
+            }
+            {
+              name: 'LANGFUSE_INIT_USER_EMAIL'
+              value: langfuseInitUserEmail
+            }
+            {
+              name: 'LANGFUSE_INIT_USER_NAME'
+              value: langfuseInitUserName
+            }
+            {
+              name: 'LANGFUSE_INIT_USER_PASSWORD'
+              secretRef: 'langfuse-init-user-password'
+            }
+            {
+              name: 'LANGFUSE_INIT_ORG_NAME'
+              value: langfuseInitOrgName
+            }
+            {
+              name: 'LANGFUSE_INIT_PROJECT_NAME'
+              value: langfuseInitProjectName
+            }
+            {
+              name: 'AUTH_DISABLE_SIGNUP'
+              value: 'true'
             }
             {
               name: 'NEXTAUTH_SECRET'
