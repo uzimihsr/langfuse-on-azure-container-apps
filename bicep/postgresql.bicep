@@ -1,7 +1,8 @@
 param psqlName string
 
-param psqlAdminUserName string = 'postgresql'
-param psqlAdminUserLoginPassword string = uniqueString('postgres-password', resourceGroup().id)
+param psqlAdminUserName string
+@secure()
+param psqlAdminUserLoginPassword string
 
 resource postgreSql 'Microsoft.DBforPostgreSQL/flexibleServers@2025-01-01-preview' = {
   name: psqlName

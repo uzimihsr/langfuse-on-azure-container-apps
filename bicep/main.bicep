@@ -40,6 +40,7 @@ module storage './storage.bicep' = {
 }
 
 param psqlName string = 'psql-langfuse-${uniqueString(resourceGroup().id)}'
+param psqlAdminUserName string = 'postgresql'
 module postgresql './postgresql.bicep' = {
   name: 'postgresql-deployment'
   params: {
@@ -48,6 +49,8 @@ module postgresql './postgresql.bicep' = {
     vnetName: vnetName
     subnetName: subnetNamePrivateEndpointPostgreSql
     pepName: 'pep-${psqlName}'
+    psqlAdminUserLoginPassword: uniqueString('postgres-password', resourceGroup().id)
+    psqlAdminUserName: psqlAdminUserName
   }
   dependsOn: [
     vnet
