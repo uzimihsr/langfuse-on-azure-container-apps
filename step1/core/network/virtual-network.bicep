@@ -2,8 +2,6 @@ param name string
 param vnetAddressPrefix string
 param subnetNameContainerAppsEnvironment string
 param subnetAddressPrefixContainerAppsEnvironment string
-param subnetNamePrivateEndpointContainerApps string
-param subnetAddressPrefixPrivateEndpointContainerApps string
 
 resource vnet 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   name: name
@@ -34,19 +32,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-07-01' = {
               }
             }
           ]
-          serviceEndpoints: []
-          privateEndpointNetworkPolicies: 'Disabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-        type: 'Microsoft.Network/virtualNetworks/subnets'
-      }
-      {
-        name: subnetNamePrivateEndpointContainerApps
-        properties: {
-          addressPrefixes: [
-            subnetAddressPrefixPrivateEndpointContainerApps
-          ]
-          delegations: []
           serviceEndpoints: []
           privateEndpointNetworkPolicies: 'Disabled'
           privateLinkServiceNetworkPolicies: 'Enabled'

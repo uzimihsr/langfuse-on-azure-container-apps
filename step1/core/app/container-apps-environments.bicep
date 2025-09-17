@@ -1,8 +1,18 @@
 param name string
 param logAnalyticsWorkspaceName string
+param virtualNetworkName string
+param subnetName string
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' existing = {
   name: logAnalyticsWorkspaceName
+}
+
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
+  name: virtualNetworkName
+}
+resource subnetContainerAppsEnvironment 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
+  parent: virtualNetwork
+  name: subnetName
 }
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2025-02-02-preview' = {
@@ -39,7 +49,9 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2025-02-02-
       }
     }
     publicNetworkAccess: 'Enabled'
-    vnetConfiguration: {}
+    vnetConfiguration: {
+      infrastructureSubnetId: subnetContainerAppsEnvironment.id
+    }
   }
   identity: {
     type: 'SystemAssigned'

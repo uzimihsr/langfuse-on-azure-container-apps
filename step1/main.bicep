@@ -1,9 +1,7 @@
 param virtualNetworkName string = 'vnet-${uniqueString(resourceGroup().id)}'
 param virtualNetworkAddressPrefix string = '10.10.0.0/16'
 param subnetNameContainerAppsEnvironment string = 'snet-cae-${uniqueString(resourceGroup().id)}'
-param subnetAddressPrefixContainerAppsEnvironment string = '10.10.1.0/23'
-param subnetNamePrivateEndpointContainerApps string = 'snet-pep-cae-${uniqueString(resourceGroup().id)}'
-param subnetAddressPrefixPrivateEndpointContainerApps string = '10.10.3.0/24'
+param subnetAddressPrefixContainerAppsEnvironment string = '10.10.2.0/23'
 module virtualNetwork './core/network/virtual-network.bicep' = {
   name: 'vnet-deployment'
   params: {
@@ -11,8 +9,6 @@ module virtualNetwork './core/network/virtual-network.bicep' = {
     vnetAddressPrefix: virtualNetworkAddressPrefix
     subnetNameContainerAppsEnvironment: subnetNameContainerAppsEnvironment
     subnetAddressPrefixContainerAppsEnvironment: subnetAddressPrefixContainerAppsEnvironment
-    subnetNamePrivateEndpointContainerApps: subnetNamePrivateEndpointContainerApps
-    subnetAddressPrefixPrivateEndpointContainerApps: subnetAddressPrefixPrivateEndpointContainerApps
   }
 }
 
@@ -30,6 +26,8 @@ module containerAppsEnvironment './core/app/container-apps-environments.bicep' =
   params: {
     name: containerAppsEnvironmentName
     logAnalyticsWorkspaceName: logAnalyticsName
+    virtualNetworkName: virtualNetworkName
+    subnetName: subnetNameContainerAppsEnvironment
   }
   dependsOn: [
     logAnalytics

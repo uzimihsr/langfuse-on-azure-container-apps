@@ -10,9 +10,7 @@
   - (TODO) step0 +
     - ハードコードされている機密情報系を分離してデプロイ時に指定できるようパラメータ化
     - ログ保存用にLog Analyticsを追加
-    - VNet対応
-      - Container Apps自体のVNet統合
-      - プライベートエンドポイント設定
+    - step2以降のデータストア分離に向けてVNet統合
     - インターネット経由のアクセスを制限
 - step2(TODO): step1 + ストレージ(minio)を分離、Azure Blob Storageに移行
   - イベントが永続化される
