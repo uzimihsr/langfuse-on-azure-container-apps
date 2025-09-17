@@ -1,21 +1,9 @@
-param logAnalyticsName string = 'log-${uniqueString(resourceGroup().id)}'
-module logAnalytics './core/monitor/log-analytics.bicep' = {
-  name: 'loganalytics-deployment'
-  params: {
-    name: logAnalyticsName
-  }
-}
-
 param containerAppsEnvironmentName string = 'cae-${uniqueString(resourceGroup().id)}'
 module containerAppsEnvironment './core/app/container-apps-environments.bicep' = {
   name: 'containerappsenv-deployment'
   params: {
     name: containerAppsEnvironmentName
-    logAnalyticsWorkspaceName: logAnalyticsName
   }
-  dependsOn: [
-    logAnalytics
-  ]
 }
 
 param containerAppName string = 'ca-${uniqueString(resourceGroup().id)}'
