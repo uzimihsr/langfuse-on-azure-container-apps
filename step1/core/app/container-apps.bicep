@@ -1,18 +1,18 @@
 param name string
 param containerAppsEnvironmentName string
+param keyVaultName string
 
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2025-02-02-preview' existing = {
   name: containerAppsEnvironmentName
 }
+resource keyVault 'Microsoft.KeyVault/vaults@2024-12-01-preview' existing = {
+  name: keyVaultName
+}
 
 var nextauthUrl = 'https://${name}.${containerAppsEnvironment.properties.defaultDomain}'
 param postgresVersion string = 'latest'
-param postgresUser string = 'postgres'
-param postgresPassword string = 'postgres' // CHANGEME
-param postgresDb string = 'postgres'
-param databaseUrl string = 'postgresql://${postgresUser}:${postgresPassword}@localhost:5432/${postgresDb}'
-param salt string = 'mysalt' // CHANGEME
-param encryptionKey string = '0000000000000000000000000000000000000000000000000000000000000000' // CHANGEME
+param postgresUser string
+param postgresDb string
 param telemetryEnabled string
 param langfuseEnableExperimentalFeatures string
 param clickhouseDb string = 'default'
@@ -23,7 +23,6 @@ param clickhouseUser string
 param clickhousePassword string
 param clickhouseClusterEnabled string
 param minioRootUser string = 'minio'
-param minioRootPassword string = 'miniosecret' // CHANGEME
 param langfuseUseAzureBlob string
 param langfuseS3EventUploadBucket string
 param langfuseS3EventUploadRegion string
@@ -63,7 +62,6 @@ param redisTlsCert string
 param redisTlsKey string
 param emailFromAddress string
 param smtpConnectionUrl string
-param nextauthSecret string = 'mysecret' // CHANGEME
 param langfuseInitOrgId string
 param langfuseInitOrgName string
 param langfuseInitProjectId string
@@ -168,19 +166,39 @@ resource containerApps 'Microsoft.App/containerapps@2025-02-02-preview' = {
       identitySettings: []
       maxInactiveRevisions: 100
       secrets: [
-        { name: 'database-url', value: databaseUrl }
-        { name: 'salt', value: salt }
-        { name: 'encryption-key', value: encryptionKey }
+        {
+          name: 'database-url'
+          keyVaultUrl: '${keyVault.properties.vaultUri}secrets/postgres-connection-string'
+          identity: 'system'
+        }
+        { name: 'salt', keyVaultUrl: '${keyVault.properties.vaultUri}secrets/langfuse-salt', identity: 'system' }
+        {
+          name: 'encryption-key'
+          keyVaultUrl: '${keyVault.properties.vaultUri}secrets/langfuse-encryption-key'
+          identity: 'system'
+        }
         { name: 'clickhouse-password', value: clickhousePassword }
         { name: 'langfuse-s3-event-upload-secret-access-key', value: langfuseS3EventUploadSecretAccessKey }
         { name: 'langfuse-s3-media-upload-secret-access-key', value: langfuseS3MediaUploadSecretAccessKey }
         { name: 'langfuse-s3-batch-export-secret-access-key', value: langfuseS3BatchExportSecretAccessKey }
         { name: 'redis-auth', value: redisAuth }
-        { name: 'nextauth-secret', value: nextauthSecret }
+        {
+          name: 'nextauth-secret'
+          keyVaultUrl: '${keyVault.properties.vaultUri}secrets/langfuse-nextauth-secret'
+          identity: 'system'
+        }
         // { name: 'langfuse-init-project-secret-key', value: langfuseInitProjectSecretKey } // valueが空のSecretは作成できない
         // { name: 'langfuse-init-user-password', value: langfuseInitUserPassword } // valueが空のSecretは作成できない
-        { name: 'minio-root-password', value: minioRootPassword }
-        { name: 'postgres-password', value: postgresPassword }
+        {
+          name: 'minio-root-password'
+          keyVaultUrl: '${keyVault.properties.vaultUri}secrets/minio-root-password'
+          identity: 'system'
+        }
+        {
+          name: 'postgres-password'
+          keyVaultUrl: '${keyVault.properties.vaultUri}secrets/postgres-password'
+          identity: 'system'
+        }
       ]
     }
     template: {
@@ -327,5 +345,16 @@ resource containerApps 'Microsoft.App/containerapps@2025-02-02-preview' = {
         }
       ]
     }
+  }
+}
+
+var roleId = '4633458b-17de-408a-b874-0445c86b69e6' // https://learn.microsoft.com/ja-jp/azure/role-based-access-control/built-in-roles/security#key-vault-secrets-user
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: keyVault
+  name: guid(keyVault.id, roleId, containerApps.id)
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleId)
+    principalId: containerApps.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }

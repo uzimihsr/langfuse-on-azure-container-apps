@@ -79,3 +79,13 @@ param langfuseInitProjectSecretKey = readEnvironmentVariable('LANGFUSE_INIT_PROJ
 param langfuseInitUserEmail = readEnvironmentVariable('LANGFUSE_INIT_USER_EMAIL', '')
 param langfuseInitUserName = readEnvironmentVariable('LANGFUSE_INIT_USER_NAME', '')
 param langfuseInitUserPassword = readEnvironmentVariable('LANGFUSE_INIT_USER_PASSWORD', '')
+param postgresUser = readEnvironmentVariable('POSTGRES_USER', 'postgres')
+param postgresDb = readEnvironmentVariable('POSTGRES_DB', 'postgres')
+param postgresPassword = readEnvironmentVariable('POSTGRES_PASSWORD', 'postgres')
+param langfuseSalt = readEnvironmentVariable('SALT', 'mysalt')
+param langfuseEncryptionKey = readEnvironmentVariable(
+  'ENCRYPTION_KEY',
+  '0000000000000000000000000000000000000000000000000000000000000000'
+)
+param langfuseNextAuthSecret = readEnvironmentVariable('NEXTAUTH_SECRET', 'mysecret')
+param minioRootPassword = readEnvironmentVariable('MINIO_ROOT_PASSWORD', 'miniosecret')

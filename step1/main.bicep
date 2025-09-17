@@ -25,6 +25,35 @@ module keyvault './core/secret/key-vault.bicep' = {
   ]
 }
 
+@secure()
+param postgresPassword string
+param postgresUser string
+param postgresDb string
+@secure()
+param langfuseSalt string
+@secure()
+param langfuseEncryptionKey string
+@secure()
+param langfuseNextAuthSecret string
+@secure()
+param minioRootPassword string
+module secrets './core/secret/secrets.bicep' = {
+  name: 'secrets-deployment'
+  params: {
+    keyVaultName: keyVaultName
+    postgresUser: postgresUser
+    postgresDb: postgresDb
+    postgresPassword: postgresPassword
+    langfuseSalt: langfuseSalt
+    langfuseEncryptionKey: langfuseEncryptionKey
+    langfuseNextAuthSecret: langfuseNextAuthSecret
+    minioRootPassword: minioRootPassword
+  }
+  dependsOn: [
+    keyvault
+  ]
+}
+
 param logAnalyticsName string = 'log-${uniqueString(resourceGroup().id)}'
 module logAnalytics './core/monitor/log-analytics.bicep' = {
   name: 'loganalytics-deployment'
@@ -110,6 +139,7 @@ module containerApps './core/app/container-apps.bicep' = {
   name: 'containerapp-deployment'
   params: {
     name: containerAppName
+    keyVaultName: keyVaultName
     containerAppsEnvironmentName: containerAppsEnvironmentName
     telemetryEnabled: telemetryEnabled
     langfuseEnableExperimentalFeatures: langfuseEnableExperimentalFeatures
@@ -162,8 +192,12 @@ module containerApps './core/app/container-apps.bicep' = {
     langfuseInitUserEmail: langfuseInitUserEmail
     langfuseInitUserName: langfuseInitUserName
     langfuseInitUserPassword: langfuseInitUserPassword
+    postgresUser: postgresUser
+    postgresDb: postgresDb
   }
   dependsOn: [
     containerAppsEnvironment
+    keyvault
+    secrets
   ]
 }
