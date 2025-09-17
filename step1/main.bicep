@@ -12,6 +12,19 @@ module virtualNetwork './core/network/virtual-network.bicep' = {
   }
 }
 
+param keyVaultName string = 'kv${uniqueString(resourceGroup().id)}'
+module keyvault './core/secret/key-vault.bicep' = {
+  name: 'keyvault-deployment'
+  params: {
+    name: keyVaultName
+    virtualNetworkName: virtualNetworkName
+    subnetName: subnetNameContainerAppsEnvironment
+  }
+  dependsOn: [
+    virtualNetwork
+  ]
+}
+
 param logAnalyticsName string = 'log-${uniqueString(resourceGroup().id)}'
 module logAnalytics './core/monitor/log-analytics.bicep' = {
   name: 'loganalytics-deployment'

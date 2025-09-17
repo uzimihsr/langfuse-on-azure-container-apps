@@ -8,7 +8,7 @@
   - 簡単にLangfuseの動作を確認するだけならこれでもたぶんOK
 - [step1](step1) : パスワード関連の保護+ロギング+ネットワーク関連の設定を強化
   - (TODO) step0 +
-    - ハードコードされている機密情報系を分離してデプロイ時に指定できるようパラメータ化
+    - コンテナに渡すパスワード等の機密情報をKeyVaultで管理
     - ログ保存用にLog Analyticsを追加
     - step2以降のデータストア分離に向けてVNet統合
 - step2(TODO): step1 + ストレージ(minio)を分離、Azure Blob Storageに移行

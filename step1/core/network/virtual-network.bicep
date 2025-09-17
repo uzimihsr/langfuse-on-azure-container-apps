@@ -32,7 +32,14 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-07-01' = {
               }
             }
           ]
-          serviceEndpoints: []
+          serviceEndpoints: [
+            {
+              service: 'Microsoft.KeyVault'
+              locations: [
+                '*'
+              ]
+            }
+          ]
           privateEndpointNetworkPolicies: 'Disabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
         }
